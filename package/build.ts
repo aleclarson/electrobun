@@ -122,7 +122,10 @@ try {
 		await copyToDist();
 	}
 } catch (err) {
-	console.log(err);
+	if (err instanceof $.ShellError) {
+		process.exit(err.exitCode);
+	}
+	console.error(err);
 }
 
 // Global variables to store build tool paths
