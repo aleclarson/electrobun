@@ -2027,6 +2027,15 @@ async function buildNative() {
 async function buildLauncher() {
 	console.log(`Building launcher for ${OS} ${ARCH}...`);
 
+	if (OS === "macos") {
+		const target = ARCH === "arm64" ? "aarch64-macos" : "x86_64-macos";
+		const optimizeArgs = CHANNEL === "release" ? ["-O", "ReleaseSmall"] : [];
+
+		await $`mkdir -p src/launcher/zig-out/bin`;
+		await $`cd src/launcher && ${PATH.zig.BIN} build-exe main.zig -target ${target} -lc ${optimizeArgs} -femit-bin=zig-out/bin/launcher${binExt}`;
+		return;
+	}
+
 	let zigArgs: string[] = [];
 
 	if (OS === "win") {
@@ -2076,6 +2085,15 @@ async function buildMainJs() {
 }
 
 async function buildSelfExtractor() {
+	if (OS === "macos") {
+		const target = ARCH === "arm64" ? "aarch64-macos" : "x86_64-macos";
+		const optimizeArgs = CHANNEL === "release" ? ["-O", "ReleaseSmall"] : [];
+
+		await $`mkdir -p src/extractor/zig-out/bin`;
+		await $`cd src/extractor && ${PATH.zig.BIN} build-exe main.zig -target ${target} -lc ${optimizeArgs} -femit-bin=zig-out/bin/extractor${binExt}`;
+		return;
+	}
+
 	const zigArgs =
 		OS === "win"
 			? ["-Dtarget=x86_64-windows", "-Dcpu=baseline"]
